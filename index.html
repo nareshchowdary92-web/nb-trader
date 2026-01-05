@@ -94,26 +94,25 @@
   <header>NB Trader</header>
 
   <div id="statusBox" class="status wait">
-    🟡 WAIT – MARKET STABILIZING
+    🟡 WAIT – NO CLEAN SETUP
   </div>
 
   <div class="buttons">
-    <button onclick="loadChart('NSE:NIFTY')">Open NIFTY Chart</button>
-    <button onclick="loadChart('BSE:SENSEX')">Open SENSEX Chart</button>
+    <button onclick="loadChart('NSE:NIFTY50')">Open NIFTY (1m)</button>
+    <button onclick="loadChart('BSE:SENSEX')">Open SENSEX (Daily)</button>
   </div>
 
-  <!-- TradingView Chart Container -->
+  <!-- Chart -->
   <div id="tv_chart"></div>
 
   <!-- Friend Bot -->
   <div id="friendBotIcon">🤖</div>
-
   <div id="friendBotPanel">
     <strong>Friend Bot</strong>
     <p id="botMsg">Market unclear. Best trade is no trade.</p>
   </div>
 
-  <!-- FRIEND BOT + STATUS LOGIC -->
+  <!-- STATUS + FRIEND BOT LOGIC -->
   <script>
     const botIcon = document.getElementById("friendBotIcon");
     const botPanel = document.getElementById("friendBotPanel");
@@ -131,15 +130,15 @@
       if (r > 0.85) {
         statusBox.className = "status news";
         statusBox.innerText = "🔔 NEWS HIGH VOLATILITY – NO TRADE";
-        botMsg.innerText = "Important news or volatility detected. Stay out.";
+        botMsg.innerText = "High volatility detected. Stay safe.";
       } else if (r > 0.65) {
         statusBox.className = "status buy";
         statusBox.innerText = "🟢 BUY BIAS – WAIT FOR CONFIRMATION";
-        botMsg.innerText = "Bullish bias. Wait for candle confirmation.";
+        botMsg.innerText = "Bullish bias. Wait for confirmation.";
       } else if (r > 0.45) {
         statusBox.className = "status sell";
         statusBox.innerText = "🔴 SELL BIAS – WAIT FOR CONFIRMATION";
-        botMsg.innerText = "Bearish bias. Wait for rejection near resistance.";
+        botMsg.innerText = "Bearish bias. Wait for rejection.";
       } else {
         statusBox.className = "status wait";
         statusBox.innerText = "🟡 WAIT – NO CLEAN SETUP";
@@ -150,7 +149,7 @@
     setInterval(updateSignal, 8000);
   </script>
 
-  <!-- TRADINGVIEW SCRIPT -->
+  <!-- TRADINGVIEW -->
   <script src="https://s3.tradingview.com/tv.js"></script>
 
   <script>
@@ -161,11 +160,18 @@
         document.getElementById("tv_chart").innerHTML = "";
       }
 
+      // ✅ Interval control
+      let interval = "1"; // default for NIFTY
+
+      if (symbol === "BSE:SENSEX") {
+        interval = "D"; // SENSEX supports only D/W/M
+      }
+
       chart = new TradingView.widget({
         width: "100%",
         height: 500,
         symbol: symbol,
-        interval: "1",
+        interval: interval,
         timezone: "Asia/Kolkata",
         theme: "dark",
         style: "1",
