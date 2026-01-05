@@ -152,38 +152,44 @@
   <!-- TRADINGVIEW -->
   <script src="https://s3.tradingview.com/tv.js"></script>
 
-  <script>
-    let chart = null;
+<script>
+let chart = null;
 
-    function loadChart(symbol) {
-      if (chart) {
-        document.getElementById("tv_chart").innerHTML = "";
-      }
+function loadChart(symbol) {
+  if (chart) {
+    document.getElementById("tv_chart").innerHTML = "";
+  }
 
-      // ✅ Interval control
-      let interval = "1"; // default for NIFTY
+  // ✅ SAFE DEFAULT
+  let interval = "D";
 
-      if (symbol === "BSE:SENSEX") {
-        interval = "D"; // SENSEX supports only D/W/M
-      }
+  // ✅ NIFTY → intraday allowed
+  if (symbol === "NSE:NIFTY_INDEX") {
+    interval = "1";
+  }
 
-      chart = new TradingView.widget({
-        width: "100%",
-        height: 500,
-        symbol: symbol,
-        interval: interval,
-        timezone: "Asia/Kolkata",
-        theme: "dark",
-        style: "1",
-        locale: "en",
-        toolbar_bg: "#020617",
-        enable_publishing: false,
-        allow_symbol_change: false,
-        container_id: "tv_chart"
-      });
-    }
-  </script>
+  // ✅ SENSEX → daily only
+  if (symbol === "BSE:SENSEX") {
+    interval = "D";
+  }
+
+  chart = new TradingView.widget({
+    width: "100%",
+    height: 500,
+    symbol: symbol,
+    interval: interval,
+    timezone: "Asia/Kolkata",
+    theme: "dark",
+    style: "1",
+    locale: "en",
+    enable_publishing: false,
+    allow_symbol_change: false,
+    container_id: "tv_chart"
+  });
+}
+</script>
 
 </body>
 </html>
+
 
