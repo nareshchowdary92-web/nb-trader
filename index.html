@@ -98,7 +98,7 @@
   </div>
 
   <div class="buttons">
-   <button onclick="loadChart('NSE:NIFTY_INDEX')">Open NIFTY (1m)</button>
+   <button onclick="loadChart('NSE:NIFTY1!')">Open NIFTY Futures (1m)</button>
     <button onclick="loadChart('BSE:SENSEX')">Open SENSEX (Daily)</button>
   </div>
 
@@ -160,15 +160,14 @@ function loadChart(symbol) {
     document.getElementById("tv_chart").innerHTML = "";
   }
 
-  // ✅ SAFE DEFAULT
-  let interval = "D";
+  let interval = "D"; // safe default
 
-  // ✅ NIFTY → intraday allowed
-  if (symbol === "NSE:NIFTY_INDEX") {
+  // NIFTY Futures → intraday allowed
+  if (symbol === "NSE:NIFTY1!") {
     interval = "1";
   }
 
-  // ✅ SENSEX → daily only
+  // SENSEX → daily only
   if (symbol === "BSE:SENSEX") {
     interval = "D";
   }
@@ -191,5 +190,6 @@ function loadChart(symbol) {
 
 </body>
 </html>
+
 
 
