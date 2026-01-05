@@ -10,14 +10,12 @@
       font-family: Arial, sans-serif;
       background: #0f172a;
       color: white;
-      text-align: center;
     }
 
     header {
       padding: 15px;
       font-size: 22px;
       font-weight: bold;
-      text-align: left;
       background: #020617;
     }
 
@@ -26,6 +24,7 @@
       margin: 10px;
       font-weight: bold;
       border-radius: 6px;
+      text-align: center;
     }
 
     .wait { background: #92400e; }
@@ -34,6 +33,7 @@
     .news { background: #1e3a8a; }
 
     .buttons {
+      text-align: center;
       margin: 15px;
     }
 
@@ -52,10 +52,10 @@
       background: #1d4ed8;
     }
 
-    #tv_chart {
+    .chart-box {
       width: 100%;
-      height: 500px;
-      margin-top: 10px;
+      height: 600px;
+      margin-top: 15px;
     }
 
     /* Friend Bot */
@@ -84,7 +84,6 @@
       border-radius: 8px;
       padding: 10px;
       display: none;
-      text-align: left;
     }
   </style>
 </head>
@@ -93,26 +92,46 @@
 
   <header>NB Trader</header>
 
+  <!-- STATUS BAR -->
   <div id="statusBox" class="status wait">
     🟡 WAIT – NO CLEAN SETUP
   </div>
 
+  <!-- BUTTONS (VISUAL ONLY) -->
   <div class="buttons">
-   <button onclick="loadChart('NSE:NIFTY1!')">Open NIFTY Futures (1m)</button>
-    <button onclick="loadChart('BSE:SENSEX')">Open SENSEX (Daily)</button>
+    <button onclick="scrollToNifty()">Open NIFTY (1m)</button>
+    <button onclick="scrollToSensex()">Open SENSEX (Daily)</button>
   </div>
 
-  <!-- Chart -->
-  <div id="tv_chart"></div>
+  <!-- NIFTY CHART -->
+  <div id="nifty" class="chart-box">
+    <iframe
+      src="https://www.tradingview.com/widgetembed/?symbol=NSE%3ANIFTY&interval=1&theme=dark&style=1&timezone=Asia%2FKolkata"
+      style="width:100%;height:100%;"
+      frameborder="0"
+      allowfullscreen>
+    </iframe>
+  </div>
 
-  <!-- Friend Bot -->
+  <!-- SENSEX CHART -->
+  <div id="sensex" class="chart-box">
+    <iframe
+      src="https://www.tradingview.com/widgetembed/?symbol=BSE%3ASENSEX&interval=D&theme=dark&style=1&timezone=Asia%2FKolkata"
+      style="width:100%;height:100%;"
+      frameborder="0"
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <!-- FRIEND BOT -->
   <div id="friendBotIcon">🤖</div>
+
   <div id="friendBotPanel">
     <strong>Friend Bot</strong>
     <p id="botMsg">Market unclear. Best trade is no trade.</p>
   </div>
 
-  <!-- STATUS + FRIEND BOT LOGIC -->
+  <!-- LOGIC -->
   <script>
     const botIcon = document.getElementById("friendBotIcon");
     const botPanel = document.getElementById("friendBotPanel");
@@ -130,7 +149,7 @@
       if (r > 0.85) {
         statusBox.className = "status news";
         statusBox.innerText = "🔔 NEWS HIGH VOLATILITY – NO TRADE";
-        botMsg.innerText = "High volatility detected. Stay safe.";
+        botMsg.innerText = "High volatility detected. Stay out.";
       } else if (r > 0.65) {
         statusBox.className = "status buy";
         statusBox.innerText = "🟢 BUY BIAS – WAIT FOR CONFIRMATION";
@@ -147,49 +166,15 @@
     }
 
     setInterval(updateSignal, 8000);
+
+    function scrollToNifty() {
+      document.getElementById("nifty").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function scrollToSensex() {
+      document.getElementById("sensex").scrollIntoView({ behavior: "smooth" });
+    }
   </script>
-
-  <!-- TRADINGVIEW -->
-  <script src="https://s3.tradingview.com/tv.js"></script>
-
-<script>
-let chart = null;
-
-function loadChart(symbol) {
-  if (chart) {
-    document.getElementById("tv_chart").innerHTML = "";
-  }
-
-  let interval = "D"; // safe default
-
-  // NIFTY Futures → intraday allowed
-  if (symbol === "NSE:NIFTY1!") {
-    interval = "1";
-  }
-
-  // SENSEX → daily only
-  if (symbol === "BSE:SENSEX") {
-    interval = "D";
-  }
-
-  chart = new TradingView.widget({
-    width: "100%",
-    height: 500,
-    symbol: symbol,
-    interval: interval,
-    timezone: "Asia/Kolkata",
-    theme: "dark",
-    style: "1",
-    locale: "en",
-    enable_publishing: false,
-    allow_symbol_change: false,
-    container_id: "tv_chart"
-  });
-}
-</script>
 
 </body>
 </html>
-
-
-
