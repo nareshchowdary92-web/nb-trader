@@ -1,191 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NB Trader</title>
+  <meta charset="UTF-8">
+  <title>NB Trader</title>
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0f172a;
-  color: #e5e7eb;
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+    }
 
-header {
-  background: #020617;
-  padding: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    header {
+      padding: 15px;
+      font-size: 22px;
+      font-weight: bold;
+      text-align: left;
+      background: #020617;
+    }
 
-select, button {
-  padding: 6px;
-  font-size: 14px;
-  margin-left: 5px;
-}
+    .status {
+      padding: 12px;
+      margin: 10px;
+      font-weight: bold;
+      border-radius: 6px;
+    }
 
-.status {
-  padding: 14px;
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-}
+    .wait { background: #92400e; }
+    .buy { background: #166534; }
+    .sell { background: #7f1d1d; }
+    .news { background: #1e3a8a; }
 
-.buy { background: #14532d; color: #bbf7d0; }
-.sell { background: #7f1d1d; color: #fecaca; }
-.wait { background: #78350f; color: #fde68a; }
-.news { background: #1e1b4b; color: #c7d2fe; }
+    .buttons {
+      margin: 15px;
+    }
 
-.actions {
-  padding: 15px;
-  text-align: center;
-}
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-.actions button {
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
+    button:hover {
+      background: #1d4ed8;
+    }
 
-.actions button:hover {
-  background: #1d4ed8;
-}
+    #tv_chart {
+      width: 100%;
+      height: 500px;
+      margin-top: 10px;
+    }
 
-/* Friend Bot */
-#friendBotIcon {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
-  background: #3b82f6;
-  border-radius: 50%;
-  font-size: 30px;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-}
+    /* Friend Bot */
+    #friendBotIcon {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #2563eb;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 24px;
+    }
 
-#friendBotPanel {
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  width: 300px;
-  background: #111827;
-  border: 2px solid #3b82f6;
-  border-radius: 10px;
-  padding: 10px;
-  display: none;
-}
-</style>
+    #friendBotPanel {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 260px;
+      background: #020617;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px;
+      display: none;
+      text-align: left;
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-  <strong>NB Trader</strong>
-  <div>
-    <select id="timeframe">
-      <option>1 Minute</option>
-      <option>5 Minutes</option>
-      <option>15 Minutes</option>
-    </select>
+  <header>NB Trader</header>
+
+  <div id="statusBox" class="status wait">
+    🟡 WAIT – MARKET STABILIZING
   </div>
-</header>
 
-<div id="statusBox" class="status wait">
-  🟡 WAIT – MARKET STABILIZING
-</div>
+  <div class="buttons">
+    <button onclick="loadChart('NSE:NIFTY')">Open NIFTY Chart</button>
+    <button onclick="loadChart('BSE:SENSEX')">Open SENSEX Chart</button>
+  </div>
 
-<div class="actions">
-  <button onclick="loadChart('NSE:NIFTY')">Open NIFTY Chart</button>
-<button onclick="loadChart('BSE:SENSEX')">Open SENSEX Chart</button>
-
+  <!-- TradingView Chart Container -->
   <div id="tv_chart"></div>
 
-<!-- Friend Bot -->
-<div id="friendBotIcon">🤖</div>
+  <!-- Friend Bot -->
+  <div id="friendBotIcon">🤖</div>
 
-<div id="friendBotPanel">
-  <strong>Friend Bot</strong>
-  <p id="botMsg">Waiting for market clarity...</p>
-</div>
+  <div id="friendBotPanel">
+    <strong>Friend Bot</strong>
+    <p id="botMsg">Market unclear. Best trade is no trade.</p>
+  </div>
 
-<script src="https://s3.tradingview.com/tv.js"></script>
+  <!-- FRIEND BOT + STATUS LOGIC -->
+  <script>
+    const botIcon = document.getElementById("friendBotIcon");
+    const botPanel = document.getElementById("friendBotPanel");
+    const botMsg = document.getElementById("botMsg");
+    const statusBox = document.getElementById("statusBox");
 
-<script>
-let chart = null;
+    botIcon.onclick = () => {
+      botPanel.style.display =
+        botPanel.style.display === "block" ? "none" : "block";
+    };
 
-function loadChart(symbol) {
-  if (chart) {
-    document.getElementById("tv_chart").innerHTML = "";
-  }
+    function updateSignal() {
+      const r = Math.random();
 
-  chart = new TradingView.widget({
-    width: "100%",
-    height: 500,
-    symbol: symbol,
-    interval: "1",
-    timezone: "Asia/Kolkata",
-    theme: "dark",
-    style: "1",
-    locale: "en",
-    toolbar_bg: "#1e1e1e",
-    enable_publishing: false,
-    allow_symbol_change: false,
-    container_id: "tv_chart"
-  });
-}
-</script>
+      if (r > 0.85) {
+        statusBox.className = "status news";
+        statusBox.innerText = "🔔 NEWS HIGH VOLATILITY – NO TRADE";
+        botMsg.innerText = "Important news or volatility detected. Stay out.";
+      } else if (r > 0.65) {
+        statusBox.className = "status buy";
+        statusBox.innerText = "🟢 BUY BIAS – WAIT FOR CONFIRMATION";
+        botMsg.innerText = "Bullish bias. Wait for candle confirmation.";
+      } else if (r > 0.45) {
+        statusBox.className = "status sell";
+        statusBox.innerText = "🔴 SELL BIAS – WAIT FOR CONFIRMATION";
+        botMsg.innerText = "Bearish bias. Wait for rejection near resistance.";
+      } else {
+        statusBox.className = "status wait";
+        statusBox.innerText = "🟡 WAIT – NO CLEAN SETUP";
+        botMsg.innerText = "Market unclear. Best trade is no trade.";
+      }
+    }
 
-// Friend Bot toggle
-const botIcon = document.getElementById("friendBotIcon");
-const botPanel = document.getElementById("friendBotPanel");
-const botMsg = document.getElementById("botMsg");
+    setInterval(updateSignal, 8000);
+  </script>
 
-botIcon.onclick = () => {
-  botPanel.style.display =
-    botPanel.style.display === "block" ? "none" : "block";
-};
+  <!-- TRADINGVIEW SCRIPT -->
+  <script src="https://s3.tradingview.com/tv.js"></script>
 
-// Signal simulation (Phase 1)
-function updateSignal() {
-  const box = document.getElementById("statusBox");
-  const r = Math.random();
+  <script>
+    let chart = null;
 
-  if (r > 0.85) {
-    box.className = "status news";
-    box.innerText = "⚠ NEWS / HIGH VOLATILITY – NO TRADE";
-    botMsg.innerText = "Important news or volatility detected. Stay out.";
-  } else if (r > 0.65) {
-    box.className = "status buy";
-    box.innerText = "🟢 BUY BIAS – WAIT FOR CONFIRMATION";
-    botMsg.innerText = "Bullish bias. Wait for candle confirmation.";
-  } else if (r > 0.45) {
-    box.className = "status sell";
-    box.innerText = "🔴 SELL BIAS – WAIT FOR CONFIRMATION";
-    botMsg.innerText = "Bearish bias. Wait for rejection near VWAP/EMA.";
-  } else {
-    box.className = "status wait";
-    box.innerText = "🟡 WAIT – NO CLEAN SETUP";
-    botMsg.innerText = "Market unclear. Best trade is no trade.";
-  }
-}
+    function loadChart(symbol) {
+      if (chart) {
+        document.getElementById("tv_chart").innerHTML = "";
+      }
 
-setInterval(updateSignal, 8000);
-</script>
+      chart = new TradingView.widget({
+        width: "100%",
+        height: 500,
+        symbol: symbol,
+        interval: "1",
+        timezone: "Asia/Kolkata",
+        theme: "dark",
+        style: "1",
+        locale: "en",
+        toolbar_bg: "#020617",
+        enable_publishing: false,
+        allow_symbol_change: false,
+        container_id: "tv_chart"
+      });
+    }
+  </script>
 
 </body>
 </html>
-
-
-
-
