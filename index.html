@@ -25,12 +25,8 @@
       font-weight: bold;
       border-radius: 6px;
       text-align: center;
+      background: #92400e;
     }
-
-    .wait { background: #92400e; }
-    .buy { background: #166534; }
-    .sell { background: #7f1d1d; }
-    .news { background: #1e3a8a; }
 
     .buttons {
       text-align: center;
@@ -44,12 +40,8 @@
       color: white;
       border: none;
       border-radius: 5px;
-      cursor: pointer;
       font-size: 14px;
-    }
-
-    button:hover {
-      background: #1d4ed8;
+      cursor: pointer;
     }
 
     .chart-box {
@@ -57,124 +49,45 @@
       height: 600px;
       margin-top: 15px;
     }
-
-    /* Friend Bot */
-    #friendBotIcon {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #2563eb;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 24px;
-    }
-
-    #friendBotPanel {
-      position: fixed;
-      bottom: 80px;
-      right: 20px;
-      width: 260px;
-      background: #020617;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 10px;
-      display: none;
-    }
   </style>
 </head>
 
 <body>
 
-  <header>NB Trader</header>
+<header>NB Trader</header>
 
-  <!-- STATUS BAR -->
-  <div id="statusBox" class="status wait">
-    🟡 WAIT – NO CLEAN SETUP
-  </div>
+<div class="status">
+  🟡 WAIT – NO CLEAN SETUP
+</div>
 
-  <!-- BUTTONS (VISUAL ONLY) -->
-  <div class="buttons">
-    <button onclick="scrollToNifty()">Open NIFTY (1m)</button>
-    <button onclick="scrollToSensex()">Open SENSEX (Daily)</button>
-  </div>
+<div class="buttons">
+  <button onclick="document.getElementById('nifty').scrollIntoView({behavior:'smooth'})">
+    Open NIFTY (1m)
+  </button>
+  <button onclick="document.getElementById('sensex').scrollIntoView({behavior:'smooth'})">
+    Open SENSEX (Daily)
+  </button>
+</div>
 
-  <!-- NIFTY CHART -->
-  <div id="nifty" class="chart-box">
-    <iframe
-      src="https://www.tradingview.com/widgetembed/?symbol=NSE%3ANIFTY&interval=1&theme=dark&style=1&timezone=Asia%2FKolkata"
-      style="width:100%;height:100%;"
-      frameborder="0"
-      allowfullscreen>
-    </iframe>
-  </div>
+<!-- NIFTY CHART -->
+<div id="nifty" class="chart-box">
+  <iframe
+    src="https://www.tradingview.com/widgetembed/?symbol=NSE%3ACNX50&interval=1&theme=dark&style=1&timezone=Asia%2FKolkata"
+    style="width:100%;height:100%;"
+    frameborder="0"
+    allowfullscreen>
+  </iframe>
+</div>
 
-  <!-- SENSEX CHART -->
-  <div id="sensex" class="chart-box">
-    <iframe
-      src="https://www.tradingview.com/widgetembed/?symbol=BSE%3ASENSEX&interval=D&theme=dark&style=1&timezone=Asia%2FKolkata"
-      style="width:100%;height:100%;"
-      frameborder="0"
-      allowfullscreen>
-    </iframe>
-  </div>
-
-  <!-- FRIEND BOT -->
-  <div id="friendBotIcon">🤖</div>
-
-  <div id="friendBotPanel">
-    <strong>Friend Bot</strong>
-    <p id="botMsg">Market unclear. Best trade is no trade.</p>
-  </div>
-
-  <!-- LOGIC -->
-  <script>
-    const botIcon = document.getElementById("friendBotIcon");
-    const botPanel = document.getElementById("friendBotPanel");
-    const botMsg = document.getElementById("botMsg");
-    const statusBox = document.getElementById("statusBox");
-
-    botIcon.onclick = () => {
-      botPanel.style.display =
-        botPanel.style.display === "block" ? "none" : "block";
-    };
-
-    function updateSignal() {
-      const r = Math.random();
-
-      if (r > 0.85) {
-        statusBox.className = "status news";
-        statusBox.innerText = "🔔 NEWS HIGH VOLATILITY – NO TRADE";
-        botMsg.innerText = "High volatility detected. Stay out.";
-      } else if (r > 0.65) {
-        statusBox.className = "status buy";
-        statusBox.innerText = "🟢 BUY BIAS – WAIT FOR CONFIRMATION";
-        botMsg.innerText = "Bullish bias. Wait for confirmation.";
-      } else if (r > 0.45) {
-        statusBox.className = "status sell";
-        statusBox.innerText = "🔴 SELL BIAS – WAIT FOR CONFIRMATION";
-        botMsg.innerText = "Bearish bias. Wait for rejection.";
-      } else {
-        statusBox.className = "status wait";
-        statusBox.innerText = "🟡 WAIT – NO CLEAN SETUP";
-        botMsg.innerText = "Market unclear. Best trade is no trade.";
-      }
-    }
-
-    setInterval(updateSignal, 8000);
-
-    function scrollToNifty() {
-      document.getElementById("nifty").scrollIntoView({ behavior: "smooth" });
-    }
-
-    function scrollToSensex() {
-      document.getElementById("sensex").scrollIntoView({ behavior: "smooth" });
-    }
-  </script>
+<!-- SENSEX CHART -->
+<div id="sensex" class="chart-box">
+  <iframe
+    src="https://www.tradingview.com/widgetembed/?symbol=BSE%3ASENSEX&interval=D&theme=dark&style=1&timezone=Asia%2FKolkata"
+    style="width:100%;height:100%;"
+    frameborder="0"
+    allowfullscreen>
+  </iframe>
+</div>
 
 </body>
 </html>
