@@ -119,19 +119,8 @@ select, button {
 </div>
 
 <script>
-function openChart(type) {
-  const tf = document.getElementById("timeframe").value;
-  let url = "";
-
-  if (type === "nifty") {
-    url = "https://www.tradingview.com/chart/?symbol=NSE:NIFTY50";
-  } else {
-    url = "https://www.tradingview.com/chart/?symbol=BSE:SENSEX";
-  }
-
-  {
+function openChart() {
   window.open("https://www.tradingview.com/chart/", "_blank");
-}
 }
 
 // Friend Bot toggle
@@ -173,5 +162,6 @@ setInterval(updateSignal, 8000);
 
 </body>
 </html>
+
 
 
