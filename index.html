@@ -129,7 +129,9 @@ function openChart(type) {
     url = "https://www.tradingview.com/chart/?symbol=BSE:SENSEX";
   }
 
-  window.open(url, "_blank");
+  function openChart() {
+  window.open("https://www.tradingview.com/chart/", "_blank");
+}
 }
 
 // Friend Bot toggle
@@ -171,3 +173,4 @@ setInterval(updateSignal, 8000);
 
 </body>
 </html>
+
