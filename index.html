@@ -106,9 +106,10 @@ select, button {
 </div>
 
 <div class="actions">
-  <button onclick="openChart('nifty')">Open NIFTY Chart</button>
-  <button onclick="openChart('sensex')">Open SENSEX Chart</button>
-</div>
+  <button onclick="loadChart('NSE:NIFTY')">Open NIFTY Chart</button>
+<button onclick="loadChart('BSE:SENSEX')">Open SENSEX Chart</button>
+
+  <div id="tv_chart"></div>
 
 <!-- Friend Bot -->
 <div id="friendBotIcon">🤖</div>
@@ -162,3 +163,4 @@ setInterval(updateSignal, 8000);
 
 </body>
 </html>
+
