@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NB Trader</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+header {
+  padding: 10px;
+  background: #020617;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+select { padding: 5px; font-size: 14px; }
+.status {
+  padding: 12px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+.buy { background: #14532d; color: #bbf7d0; }
+.sell { background: #7f1d1d; color: #fecaca; }
+.wait { background: #78350f; color: #fde68a; }
+.news { background: #1e1b4b; color: #c7d2fe; }
+#chart { height: 70vh; }
+
+/* Friend Bot */
+#friendBotIcon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px; height: 60px;
+  background: #3b82f6;
+  border-radius: 50%;
+  display: flex; justify-content: center; align-items: center;
+  cursor: pointer;
+  font-size: 30px;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  z-index: 9999;
+}
+#friendBotPanel {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 300px;
+  max-height: 400px;
+  background: #111827;
+  border: 2px solid #3b82f6;
+  border-radius: 10px;
+  padding: 10px;
+  overflow-y: auto;
+  display: none;
+  color: #e5e7eb;
+  z-index: 9999;
+}
+#friendBotPanel h3 { margin-top: 0; color: #60a5fa; }
+</style>
+</head>
+<body>
+
+<header>
+  <div><strong>NB Trader</strong></div>
+  <div>
+    <select id="symbol" onchange="reloadChart()">
+      <option value="NSE:NIFTY">Nifty</option>
+      <option value="BSE:SENSEX">Sensex</option>
+    </select>
+
+    <select id="timeframe" onchange="reloadChart()">
+      <option value="1">1 Min</option>
+      <option value="5">5 Min</option>
+      <option value="15">15 Min</option>
+    </select>
+  </div>
+</header>
+
+<div id="statusBox" class="status wait">WAIT – MARKET STABILIZING</div>
+<div id="chart"></div>
+
+<!-- Friend Bot -->
+<div id="friendBotIcon" title="Friend Bot">🤖</div>
+<div id="friendBotPanel">
+  <h3>Friend Bot</h3>
+  <div id="friendBotMessages">
+    Click the icon for help or wait for automatic guidance on signals.
+  </div>
+</div>
+
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script>
+function reloadChart() {
+  const symbol = document.getElementById("symbol").value;
+  const timeframe = document.getElementById("timeframe").value;
+
+  document.getElementById("chart").innerHTML = "";
+
+  new TradingView.widget({
+    autosize: true,
+    symbol: symbol,
+    interval: timeframe,
+    timezone: "Asia/Kolkata",
+    theme: "dark",
+    style: "1",
+    locale: "en",
+    toolbar_bg: "#020617",
+    enable_publishing: false,
+    hide_side_toolbar: false,
+    studies: [
+      "EMA@tv-basicstudies",
+      "EMA@tv-basicstudies",
+      "VWAP@tv-basicstudies",
+      "Volume@tv-basicstudies"
+    ],
+    container_id: "chart"
+  });
+}
+
+// FRIEND BOT LOGIC
+const friendBotIcon = document.getElementById("friendBotIcon");
+const friendBotPanel = document.getElementById("friendBotPanel");
+const friendBotMessages = document.getElementById("friendBotMessages");
+
+friendBotIcon.onclick = () => {
+  friendBotPanel.style.display = friendBotPanel.style.display === "block" ? "none" : "block";
+};
+
+// BASIC STATUS SIMULATION + Friend Bot popup
+function updateStatus() {
+  const statusBox = document.getElementById("statusBox");
+  let message = "";
+  let alertMsg = "";
+
+  const rand = Math.random();
+  if (rand > 0.85) {
+    statusBox.className = "status news";
+    statusBox.innerText = "⚠ HIGH VOLATILITY / NEWS – NO TRADE";
+    alertMsg = "⚠ Friend Bot: Market volatile / news detected – avoid trading!";
+    message = "Market is unstable. Wait for structure to return.";
+  } else if (rand > 0.65) {
+    statusBox.className = "status buy";
+    statusBox.innerText = "🟢 BUY BIAS – WAIT FOR CONFIRMATION";
+    alertMsg = "🟢 Friend Bot: BUY setup detected. Check entry rules!";
+    message = "Buy setup detected based on trend and EMA/VWAP.";
+  } else if (rand > 0.45) {
+    statusBox.className = "status sell";
+    statusBox.innerText = "🔴 SELL BIAS – WAIT FOR CONFIRMATION";
+    alertMsg = "🔴 Friend Bot: SELL setup detected. Check entry rules!";
+    message = "Sell setup detected based on trend and EMA/VWAP.";
+  } else {
+    statusBox.className = "status wait";
+    statusBox.innerText = "🟡 WAIT – NO CLEAN SETUP";
+    alertMsg = "🟡 Friend Bot: No clean trade setup. Stay on sidelines.";
+    message = "No clean setup currently. Wait patiently.";
+  }
+
+  friendBotMessages.innerHTML = message;
+
+  if (Notification.permission === "granted") {
+    new Notification("Friend Bot Alert", { body: alertMsg });
+  } else if (Notification.permission !== "denied") {
+    Notification.requestPermission();
+  }
+}
+
+setInterval(updateStatus, 8000);
+reloadChart();
+</script>
+</body>
+</html>
